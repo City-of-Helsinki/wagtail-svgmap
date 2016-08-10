@@ -1,0 +1,15 @@
+sudo: false
+language: python
+cache:
+  directories:
+    - "$HOME/.cache/pip"
+env:
+  - DEBUG=1
+python:
+  - "2.7"
+  - "3.4"
+install:
+  - pip install -U pip
+  - pip install -r requirements.txt -r requirements-dev.txt
+script:
+  - py.test -ra -vvv --doctest-modules --cov --cov-report term-missing
