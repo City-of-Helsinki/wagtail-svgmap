@@ -6,6 +6,7 @@ if not os.path.isdir(VAR_DIR):  # pragma: no cover
     os.makedirs(VAR_DIR)
 INSTALLED_APPS = [
     'wsm_test',
+    'wagtail_svgmap',
     'wagtail.wagtailforms',
     'wagtail.wagtailredirects',
     'wagtail.wagtailembeds',
