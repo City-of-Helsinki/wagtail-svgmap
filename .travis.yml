@@ -12,4 +12,4 @@ install:
   - pip install -U pip
   - pip install -r requirements.txt -r requirements-dev.txt
 script:
-  - py.test -ra -vvv --doctest-modules --cov --cov-report term-missing
+  - py.test -ra -vvv --cov --cov-report term-missing
