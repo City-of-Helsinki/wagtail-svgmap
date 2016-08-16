@@ -7,7 +7,7 @@
 ### As a developer
 
 * Add `wagtail_svgmap` to your `INSTALLED_APPS`
-* Add a `wagtail_svgmap.models.ImageMapBlock()` to a `StreamField` in your page class
+* Add a `wagtail_svgmap.blocks.ImageMapBlock()` to a `StreamField` in your page class
 
 ### As an end user
 
