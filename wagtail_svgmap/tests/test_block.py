@@ -13,8 +13,8 @@ stream_field = StreamField([
 
 
 @pytest.mark.django_db
-def test_id_caching(example_svg_doc):
-    map = ImageMap.objects.create(svg=example_svg_doc)
+def test_imagemap_block(example_svg_upload):
+    map = ImageMap.objects.create(svg=example_svg_upload)
     map.regions.create(element_id='green', link_external='/foobar', target='_blank')
     serialized_field_content = json.dumps(
         # This is empirically what is saved for a streamfield of the above ilk

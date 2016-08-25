@@ -11,7 +11,6 @@
 
 ### As an end user
 
-* Upload SVG files that have graphical elements with `id`s as Wagtail documents.
 * Use the Django admin interface to create `ImageMap` objects.
   Once you've selected an SVG file, you can then set which pages/documents/external URLs
   each discovered ID should link to.
