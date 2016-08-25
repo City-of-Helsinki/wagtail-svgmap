@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+from wagtail.wagtailadmin.edit_handlers import FieldPanel
 
 from wagtail_svgmap.mixins import LinkFields
 from wagtail_svgmap.svg import find_ids, Link, serialize_svg, wrap_elements_in_links
@@ -105,3 +106,9 @@ class Region(LinkFields, models.Model):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         super(Region, self).save(force_insert, force_update, using, update_fields)
         self.image_map.recache_svg(save=True)
+
+    panels = [
+         FieldPanel('image_map'),
+         FieldPanel('element_id'),
+         FieldPanel('target'),
+     ] + LinkFields.panels
