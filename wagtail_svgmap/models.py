@@ -29,6 +29,11 @@ class ImageMap(models.Model):
         return self._render_cache
 
     @property
+    def original_svg(self):
+        with self._open_original() as infp:
+            return infp.read()
+
+    @property
     def ids(self):
         if not self._ids_cache:  # pragma: no cover
             self.recache_ids()
