@@ -22,6 +22,8 @@ class ImageMapBlock(blocks.StructBlock):
             return ''
 
         image_map = value['map']
+        if not image_map:  # pragma: no cover
+            return ''
         assert isinstance(image_map, ImageMap)
 
         return mark_safe('<div class=\"image-map %(class)s\">%(svg)s</div>' % {
