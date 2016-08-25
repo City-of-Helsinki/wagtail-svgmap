@@ -97,7 +97,10 @@ class Region(LinkFields, models.Model):
         ]
 
     def __str__(self):  # pragma: no cover
-        return '#%s \u2192 %s' % (self.element_id, self.link)
+        text = '#%s' % self.element_id
+        if self.link:
+            text += '\u2192 %s' % self.link
+        return text
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         super(Region, self).save(force_insert, force_update, using, update_fields)
