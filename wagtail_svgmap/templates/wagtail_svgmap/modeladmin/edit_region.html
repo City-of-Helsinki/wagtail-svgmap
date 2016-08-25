@@ -1,0 +1,57 @@
+{% extends "modeladmin/edit.html" %}
+{% load i18n %}
+
+{% block form %}
+    <div class="row">
+        <div class="col8">
+            {{ block.super }}
+        </div>
+        <div class="col4">
+            {% if image_map %}
+                <div id="svg-preview">
+                    {{ image_map.original_svg|safe }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+{% block extra_css %}
+    {{ block.super }}
+    <style>
+        @keyframes blink-animation {
+            to {
+                visibility: hidden;
+            }
+        }
+
+        @-webkit-keyframes blink-animation {
+            to {
+                visibility: hidden;
+            }
+        }
+
+        .svgmap-highlit {
+            animation: blink-animation 0.5s steps(2, start) infinite;
+            -webkit-animation: blink-animation 0.5s steps(2, start) infinite;
+        }
+    </style>
+{% endblock %}
+{% block extra_js %}
+    {{ block.super }}
+    <script>
+        $(function () {
+            var highlightClass = "svgmap-highlit";
+            var $previewCtr = $("#svg-preview");
+            var $elementIdInput = $("#id_element_id");
+
+            function highlightCurrentElement() {
+                $previewCtr.find("." + highlightClass).removeClass(highlightClass);
+                var currentElementId = $elementIdInput.val();
+                $previewCtr.find("#" + currentElementId).addClass(highlightClass);
+            }
+
+            $elementIdInput.on("change", highlightCurrentElement);
+            highlightCurrentElement();
+        });
+    </script>
+{% endblock %}

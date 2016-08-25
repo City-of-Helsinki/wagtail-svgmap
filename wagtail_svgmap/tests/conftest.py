@@ -1,10 +1,12 @@
 from django.contrib.contenttypes.models import ContentType
-from django.core.files import File
+from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import SimpleUploadedFile
+from six import BytesIO
 
 import pytest
 from wagtail.wagtailcore.models import Collection, Page, Site
 from wagtail.wagtaildocs.models import Document
-from wagtail_svgmap.tests.utils import EXAMPLE_SVG_PATH
+from wagtail_svgmap.tests.utils import EXAMPLE_SVG_DATA
 
 
 @pytest.fixture()
@@ -43,18 +45,27 @@ def root_page():
 
 
 @pytest.fixture
-def example_svg_doc(request):
+def example_svg_file():
+    return BytesIO(EXAMPLE_SVG_DATA)
+
+
+@pytest.fixture
+def example_svg_upload():
+    return SimpleUploadedFile('example.svg', EXAMPLE_SVG_DATA)
+
+
+@pytest.fixture
+def dummy_wagtail_doc(request):
     if not Collection.objects.exists():  # pragma: no cover
         Collection.add_root()
 
     doc = Document(title='hello')
-    with open(EXAMPLE_SVG_PATH, 'rb') as infp:
-        doc.file.save('example.svg', File(infp))
+    doc.file.save('foo.txt', ContentFile('foo', 'foo.txt'))
     doc.save()
     doc = Document.objects.get(pk=doc.pk)  # Reload to ensure the upload took
 
     def nuke():
-        try:  # Try cleaning up so `/var/media` isn't full of SVGen
+        try:  # Try cleaning up so `/var/media` isn't full of foo
             doc.file.delete()
             doc.delete()
         except:

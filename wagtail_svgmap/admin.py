@@ -28,10 +28,9 @@ class RegionInline(admin.TabularInline):
 
 class ImageMapAdmin(admin.ModelAdmin):
     inlines = [RegionInline]
-    raw_id_fields = ('svg',)
 
     def get_inline_instances(self, request, obj=None):
-        if not getattr(obj, 'svg_id', None):  # No SVG selected? Pff.
+        if not getattr(obj, 'svg', None):  # No SVG selected? Pff.
             return []
         return super(ImageMapAdmin, self).get_inline_instances(request, obj=obj)
 

@@ -1,0 +1,22 @@
+{% extends "modeladmin/edit.html" %}
+{% load i18n %}
+
+{% block form %}
+    {{ block.super }}
+    <div class="regions nice-padding">
+        <h2>
+            {% trans "Regions" %}
+        </h2>
+        <ul>
+            {% for region in regions %}
+                <li>
+                    <a href="{{ region.edit_url }}"{% if region.pk %} style="font-weight: bold"{% endif %}>
+                        {{ region }}
+                    </a>
+                </li>
+            {% endfor %}
+
+        </ul>
+
+    </div>
+{% endblock %}

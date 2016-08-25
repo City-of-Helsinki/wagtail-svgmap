@@ -6,12 +6,15 @@ from wagtail_svgmap.tests.utils import IDS_IN_EXAMPLE_SVG
 
 
 @pytest.mark.django_db
-def test_admin(admin_client, example_svg_doc):
-    admin_client.post(reverse('admin:wagtail_svgmap_imagemap_add'), {'svg': example_svg_doc.pk})
+def test_admin(admin_client, example_svg_upload):
+    admin_client.post(reverse('admin:wagtail_svgmap_imagemap_add'), {
+        'title': 'test',
+        'svg': example_svg_upload,
+    })
     map = ImageMap.objects.get()
     edit_data = {
         '_save': 'Save',
-        'svg': example_svg_doc.pk,
+        'title': 'test',
         'regions-TOTAL_FORMS': 2,
         'regions-INITIAL_FORMS': 0,
         'regions-MIN_NUM_FORMS': 0,

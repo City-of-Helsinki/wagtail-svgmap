@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+from wagtail.wagtailadmin.edit_handlers import FieldPanel
 
 from wagtail_svgmap.mixins import LinkFields
 from wagtail_svgmap.svg import find_ids, Link, serialize_svg, wrap_elements_in_links
@@ -13,11 +14,11 @@ from wagtail_svgmap.svg import find_ids, Link, serialize_svg, wrap_elements_in_l
 
 @python_2_unicode_compatible
 class ImageMap(models.Model):
-    svg = models.ForeignKey(
-        to='wagtaildocs.Document',
-        on_delete=models.PROTECT,
-        verbose_name=_('SVG document'),
-        help_text=_('Choose a valid SVG document. The document must contain elements that have IDs.'),
+    title = models.CharField(max_length=255, verbose_name=_('title'))
+    svg = models.FileField(
+        upload_to='imagemaps/%Y/%m/%d',
+        verbose_name=_('SVG file'),
+        help_text=_('Choose a valid SVG file. The document must contain elements that have IDs.'),
     )
     _ids_cache = models.TextField(editable=False, blank=True, db_column='ids_cache')
     _render_cache = models.TextField(editable=False, blank=True, db_column='render_cache')
@@ -29,22 +30,23 @@ class ImageMap(models.Model):
         return self._render_cache
 
     @property
+    def original_svg(self):
+        with self._open_original() as infp:
+            return infp.read()
+
+    @property
     def ids(self):
         if not self._ids_cache:  # pragma: no cover
             self.recache_ids()
         return set(self._ids_cache.splitlines() if self._ids_cache else ())
 
-    def clean(self):
-        if self.svg_id:  # pragma: no branch
-            self.recache_ids()
-            if not self.ids:  # pragma: no cover
-                raise ValidationError('The selected SVG file (%s) contains no IDs' % self.svg.filename)
-        if self.pk and self.svg_id:
-            self.recache_svg()
-
     def save(self, *args, **kwargs):
-        self.clean()
+        initial = (not self.pk)
         super(ImageMap, self).save(*args, **kwargs)
+        if initial:
+            self.recache_ids()
+            self.recache_svg()
+            self.save()
 
     def recache_ids(self, save=False):
         with self._open_original() as stream:
@@ -58,7 +60,7 @@ class ImageMap(models.Model):
             models.Model.save(self, update_fields=('_render_cache',))
 
     def _open_original(self):
-        stream = self.svg.file
+        stream = self.svg
         stream.open()
         if stream.tell():  # pragma: no cover
             stream.seek(0)
@@ -78,7 +80,7 @@ class ImageMap(models.Model):
         return rendered
 
     def __str__(self):  # pragma: no cover
-        return self.svg.title
+        return self.title
 
 
 @python_2_unicode_compatible
@@ -96,4 +98,17 @@ class Region(LinkFields, models.Model):
         ]
 
     def __str__(self):  # pragma: no cover
-        return '#%s \u2192 %s' % (self.element_id, self.link)
+        text = '#%s' % self.element_id
+        if self.link:
+            text += '\u2192 %s' % self.link
+        return text
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        super(Region, self).save(force_insert, force_update, using, update_fields)
+        self.image_map.recache_svg(save=True)
+
+    panels = [
+         FieldPanel('image_map'),
+         FieldPanel('element_id'),
+         FieldPanel('target'),
+     ] + LinkFields.panels
