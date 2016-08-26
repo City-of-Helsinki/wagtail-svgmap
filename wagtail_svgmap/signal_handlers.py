@@ -22,5 +22,5 @@ def handle_recache_imagemap(instance, **kwargs):
         linked_maps = []
 
     for map in linked_maps:
-        if map.recache_svg(save=True):
+        if map.recache_svg(save=True):  # pragma: no branch
             log.info('Recached image map %s because %s changed', map.pk, instance)

@@ -37,7 +37,7 @@ class ImageMap(models.Model):
         :return: string of XML
         :rtype: str
         """
-        if not self._render_cache:
+        if not self._render_cache:  # pragma: no cover
             self.recache_svg()
         return self._render_cache
 

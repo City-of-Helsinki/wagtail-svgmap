@@ -27,13 +27,17 @@ class RegionCommonMixin(object):
         else:
             try:
                 image_map = ImageMap.objects.get(pk=self.request.GET['image_map'])
-            except:
+            except:  # pragma: no cover
+                # the image map parameter could be incorrect (if manually entered); ah well
                 pass
 
-        if image_map:
+        if image_map:  # pragma: no branch
+            # Switch the element ID widget to a select, since we can't have
+            # a ChoiceField of element IDs.
             context['form'].fields['element_id'].widget = Select(
                 choices=[(id, id) for id in image_map.ids]
             )
+            # Hide the image map widget (unfortunately the group header remains).
             context['form'].fields['image_map'].widget = HiddenInput()
 
         context['image_map'] = image_map
