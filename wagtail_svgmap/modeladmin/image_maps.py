@@ -2,10 +2,10 @@ from operator import attrgetter
 
 from django.shortcuts import redirect
 from django.utils.http import urlencode
-from wagtail.contrib.modeladmin.options import ModelAdmin
-from wagtail.contrib.modeladmin.views import EditView, CreateView
-from wagtail.wagtailadmin import messages
 
+from wagtail.contrib.modeladmin.options import ModelAdmin
+from wagtail.contrib.modeladmin.views import CreateView, EditView
+from wagtail.wagtailadmin import messages
 from wagtail_svgmap.models import ImageMap, Region
 
 

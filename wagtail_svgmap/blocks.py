@@ -9,11 +9,19 @@ from wagtail_svgmap.models import ImageMap
 
 
 class _ImageMapChoiceBlock(blocks.ChooserBlock):
+    """
+    Internal choice block; you shouldn't need to worry about this.
+    """
+
     target_model = ImageMap
     widget = Select
 
 
 class ImageMapBlock(blocks.StructBlock):
+    """
+    A StructBlock for StreamFields for choosing an ImageMap object and wrapping it in a CSS class.
+    """
+
     map = _ImageMapChoiceBlock(required=True, label=_('Image map'))
     css_class = blocks.CharBlock(required=False, label=_('CSS class'))
 

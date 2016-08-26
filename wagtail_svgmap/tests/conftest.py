@@ -1,7 +1,6 @@
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
-from six import BytesIO
 
 import pytest
 from wagtail.wagtailcore.models import Collection, Page, Site
@@ -45,11 +44,6 @@ def root_page():
 
 
 @pytest.fixture
-def example_svg_file():
-    return BytesIO(EXAMPLE_SVG_DATA)
-
-
-@pytest.fixture
 def example_svg_upload():
     return SimpleUploadedFile('example.svg', EXAMPLE_SVG_DATA)
 
@@ -68,7 +62,7 @@ def dummy_wagtail_doc(request):
         try:  # Try cleaning up so `/var/media` isn't full of foo
             doc.file.delete()
             doc.delete()
-        except:
+        except:  # pragma: no cover
             pass
 
     request.addfinalizer(nuke)

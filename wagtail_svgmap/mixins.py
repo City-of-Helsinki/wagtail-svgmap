@@ -28,6 +28,12 @@ class LinkFields(models.Model):
 
     @property
     def link(self):
+        """
+        Get the actual link URL for this object.
+
+        :return: URL string (might be empty)
+        :rtype: str
+        """
         if self.link_page:
             return self.link_page.url
         elif self.link_document:

@@ -2,18 +2,21 @@ from __future__ import unicode_literals
 
 from contextlib import closing
 
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-from wagtail.wagtailadmin.edit_handlers import FieldPanel
 
+from wagtail.wagtailadmin.edit_handlers import FieldPanel
 from wagtail_svgmap.mixins import LinkFields
 from wagtail_svgmap.svg import find_ids, Link, serialize_svg, wrap_elements_in_links
 
 
 @python_2_unicode_compatible
 class ImageMap(models.Model):
+    """
+    The main image map model. Caches the element IDs and prerendered linked SVG.
+    """
+
     title = models.CharField(max_length=255, verbose_name=_('title'))
     svg = models.FileField(
         upload_to='imagemaps/%Y/%m/%d',
@@ -25,39 +28,82 @@ class ImageMap(models.Model):
 
     @property
     def rendered_svg(self):
-        if not self._render_cache:
+        """
+        Get the rendered (linkified) SVG markup.
+
+        If for some reason the render cache is empty,
+        this will always rerender the markup.
+
+        :return: string of XML
+        :rtype: str
+        """
+        if not self._render_cache:  # pragma: no cover
             self.recache_svg()
         return self._render_cache
 
     @property
     def original_svg(self):
+        """
+        Get the original SVG markup from the `svg` file.
+
+        :return: string of XML
+        :rtype: str
+        """
         with self._open_original() as infp:
             return infp.read()
 
     @property
     def ids(self):
+        """
+        Get a set of element IDs discovered in the SVG file.
+
+        If for some reason the ID cache is empty,
+        it will always be recached here.
+
+        :return: set of ID strings (without leading octothorpes)
+        :rtype: set[str]
+        """
         if not self._ids_cache:  # pragma: no cover
             self.recache_ids()
         return set(self._ids_cache.splitlines() if self._ids_cache else ())
 
     def save(self, *args, **kwargs):
-        initial = (not self.pk)
         super(ImageMap, self).save(*args, **kwargs)
-        if initial:
-            self.recache_ids()
-            self.recache_svg()
+        if self.recache_ids() | self.recache_svg():  # Using `|` for non-short-circuited or
             self.save()
 
     def recache_ids(self, save=False):
+        """
+        Refresh the ID cache.
+
+        :param save: Save the ID cache to the database while at it?
+        :type save: bool
+        :return: True if the cache changed.
+        :rtype: bool
+        """
+        old_ids_cache = self._ids_cache
         with self._open_original() as stream:
             self._ids_cache = '\n'.join(sorted(set(find_ids(stream))))
-            if save:  # pragma: no cover
-                models.Model.save(self, update_fields=('_ids_cache',))
+        changed = (self._ids_cache != old_ids_cache)
+        if changed and save:  # pragma: no cover
+            models.Model.save(self, update_fields=('_ids_cache',))
+        return changed
 
     def recache_svg(self, save=False):
+        """
+        Refresh the rendered SVG cache.
+
+        :param save: Save the SVG cache to the database while at it?
+        :type save: bool
+        :return: True if the cache changed.
+        :rtype: bool
+        """
+        old_render_cache = self._render_cache
         self._render_cache = self._render()
-        if save:
+        changed = (self._render_cache != old_render_cache)
+        if changed and save:
             models.Model.save(self, update_fields=('_render_cache',))
+        return changed
 
     def _open_original(self):
         stream = self.svg
@@ -85,6 +131,10 @@ class ImageMap(models.Model):
 
 @python_2_unicode_compatible
 class Region(LinkFields, models.Model):
+    """
+    Child model to specify the link target for a given element in a given image map.
+    """
+
     image_map = models.ForeignKey(to=ImageMap, related_name='regions')
     element_id = models.CharField(verbose_name=_('element ID'), max_length=64)
     target = models.CharField(
@@ -108,7 +158,7 @@ class Region(LinkFields, models.Model):
         self.image_map.recache_svg(save=True)
 
     panels = [
-         FieldPanel('image_map'),
-         FieldPanel('element_id'),
-         FieldPanel('target'),
-     ] + LinkFields.panels
+        FieldPanel('image_map'),
+        FieldPanel('element_id'),
+        FieldPanel('target'),
+    ] + LinkFields.panels
