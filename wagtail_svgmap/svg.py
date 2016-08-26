@@ -51,17 +51,42 @@ def find_ids(svg_stream, in_elements=VISIBLE_SVG_TAGS):
 
 
 class Link(object):
+    """
+    Wrapper object for link specification.
+    """
+
     def __init__(self, url, target=None):
+        """
+        Construct a link.
+
+        :param url: The URL to link to.
+        :type url: str
+        :param target: Optional link target (HTML semantics; `_blank` for a new window, etc.)
+        :type target: str|None
+        """
         self.url = str(url)
         self.target = target
 
     def get_element(self):
+        """
+        Render the link as an SVG `<a>` element.
+
+        :rtype: xml.etree.ElementTree.Element
+        """
         return ET.Element(
             '{%s}a' % SVG_NAMESPACE,
             dict(kv for kv in self.get_element_attribs().items() if kv[0] and kv[1])
         )
 
     def get_element_attribs(self):
+        """
+        Get a dictionary of attributes for the element.
+
+        This could be niftily replaced in subclasses.
+
+        :return: key-value dict
+        :rtype: dict[str, str]
+        """
         return {
             ('{%s}href' % XLINK_NAMESPACE): self.url,
             ('{%s}target' % SVG_NAMESPACE): self.target,

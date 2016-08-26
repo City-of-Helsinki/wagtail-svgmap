@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from contextlib import closing
 
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -14,6 +13,10 @@ from wagtail_svgmap.svg import find_ids, Link, serialize_svg, wrap_elements_in_l
 
 @python_2_unicode_compatible
 class ImageMap(models.Model):
+    """
+    The main image map model. Caches the element IDs and prerendered linked SVG.
+    """
+
     title = models.CharField(max_length=255, verbose_name=_('title'))
     svg = models.FileField(
         upload_to='imagemaps/%Y/%m/%d',
@@ -25,17 +28,41 @@ class ImageMap(models.Model):
 
     @property
     def rendered_svg(self):
+        """
+        Get the rendered (linkified) SVG markup.
+
+        If for some reason the render cache is empty,
+        this will always rerender the markup.
+
+        :return: string of XML
+        :rtype: str
+        """
         if not self._render_cache:
             self.recache_svg()
         return self._render_cache
 
     @property
     def original_svg(self):
+        """
+        Get the original SVG markup from the `svg` file.
+
+        :return: string of XML
+        :rtype: str
+        """
         with self._open_original() as infp:
             return infp.read()
 
     @property
     def ids(self):
+        """
+        Get a set of element IDs discovered in the SVG file.
+
+        If for some reason the ID cache is empty,
+        it will always be recached here.
+
+        :return: set of ID strings (without leading octothorpes)
+        :rtype: set[str]
+        """
         if not self._ids_cache:  # pragma: no cover
             self.recache_ids()
         return set(self._ids_cache.splitlines() if self._ids_cache else ())
@@ -104,6 +131,10 @@ class ImageMap(models.Model):
 
 @python_2_unicode_compatible
 class Region(LinkFields, models.Model):
+    """
+    Child model to specify the link target for a given element in a given image map.
+    """
+
     image_map = models.ForeignKey(to=ImageMap, related_name='regions')
     element_id = models.CharField(verbose_name=_('element ID'), max_length=64)
     target = models.CharField(

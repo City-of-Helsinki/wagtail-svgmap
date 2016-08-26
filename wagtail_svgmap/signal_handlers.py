@@ -6,8 +6,10 @@ from wagtail_svgmap.models import ImageMap
 
 def handle_recache_imagemap(instance, **kwargs):
     """
-    Django `post_save` handler to automatically recache the rendered SVG for
-    ImageMap instances when dependencies (pages and documents) change.
+    Django `post_save` handler to automatically recache rendered SVGs.
+
+    This is called for ImageMap instances when region link
+    dependencies (pages and documents) change.
 
     :param instance: The changed instance (either a Page or Document)
     :param kwargs: Signal kwargs
@@ -20,5 +22,5 @@ def handle_recache_imagemap(instance, **kwargs):
         linked_maps = []
 
     for map in linked_maps:
-        map.recache_svg(save=True)
-        log.info('Recached image map %s because %s changed', map.pk, instance)
+        if map.recache_svg(save=True):
+            log.info('Recached image map %s because %s changed', map.pk, instance)
