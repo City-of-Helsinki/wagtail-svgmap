@@ -6,8 +6,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-from wagtail.wagtailadmin.edit_handlers import FieldPanel
 
+from wagtail.wagtailadmin.edit_handlers import FieldPanel
 from wagtail_svgmap.mixins import LinkFields
 from wagtail_svgmap.svg import find_ids, Link, serialize_svg, wrap_elements_in_links
 
@@ -41,23 +41,42 @@ class ImageMap(models.Model):
         return set(self._ids_cache.splitlines() if self._ids_cache else ())
 
     def save(self, *args, **kwargs):
-        initial = (not self.pk)
         super(ImageMap, self).save(*args, **kwargs)
-        if initial:
-            self.recache_ids()
-            self.recache_svg()
+        if self.recache_ids() | self.recache_svg():  # Using `|` for non-short-circuited or
             self.save()
 
     def recache_ids(self, save=False):
+        """
+        Refresh the ID cache.
+
+        :param save: Save the ID cache to the database while at it?
+        :type save: bool
+        :return: True if the cache changed.
+        :rtype: bool
+        """
+        old_ids_cache = self._ids_cache
         with self._open_original() as stream:
             self._ids_cache = '\n'.join(sorted(set(find_ids(stream))))
-            if save:  # pragma: no cover
-                models.Model.save(self, update_fields=('_ids_cache',))
+        changed = (self._ids_cache != old_ids_cache)
+        if changed and save:  # pragma: no cover
+            models.Model.save(self, update_fields=('_ids_cache',))
+        return changed
 
     def recache_svg(self, save=False):
+        """
+        Refresh the rendered SVG cache.
+
+        :param save: Save the SVG cache to the database while at it?
+        :type save: bool
+        :return: True if the cache changed.
+        :rtype: bool
+        """
+        old_render_cache = self._render_cache
         self._render_cache = self._render()
-        if save:
+        changed = (self._render_cache != old_render_cache)
+        if changed and save:
             models.Model.save(self, update_fields=('_render_cache',))
+        return changed
 
     def _open_original(self):
         stream = self.svg
@@ -108,7 +127,7 @@ class Region(LinkFields, models.Model):
         self.image_map.recache_svg(save=True)
 
     panels = [
-         FieldPanel('image_map'),
-         FieldPanel('element_id'),
-         FieldPanel('target'),
-     ] + LinkFields.panels
+        FieldPanel('image_map'),
+        FieldPanel('element_id'),
+        FieldPanel('target'),
+    ] + LinkFields.panels

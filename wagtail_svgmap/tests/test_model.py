@@ -1,13 +1,25 @@
+from django.core.files.base import ContentFile
+
 import pytest
 from wagtail.wagtailcore.models import Page
 from wagtail_svgmap.models import ImageMap
-from wagtail_svgmap.tests.utils import IDS_IN_EXAMPLE_SVG
+from wagtail_svgmap.tests.utils import EXAMPLE2_SVG_DATA, IDS_IN_EXAMPLE2_SVG, IDS_IN_EXAMPLE_SVG
 
 
 @pytest.mark.django_db
 def test_id_caching(example_svg_upload):
     map = ImageMap.objects.create(svg=example_svg_upload)
     assert map.ids == IDS_IN_EXAMPLE_SVG
+
+
+@pytest.mark.django_db
+def test_image_replacing(example_svg_upload):
+    map = ImageMap.objects.create(svg=example_svg_upload)
+    assert map.ids == IDS_IN_EXAMPLE_SVG
+    map.svg.save('example2.svg', ContentFile(EXAMPLE2_SVG_DATA))
+    map.save()
+    map.refresh_from_db()
+    assert map.ids == IDS_IN_EXAMPLE2_SVG
 
 
 @pytest.mark.django_db
