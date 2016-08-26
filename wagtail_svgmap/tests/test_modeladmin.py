@@ -1,5 +1,4 @@
 import pytest
-
 from wagtail_svgmap.modeladmin import ImageMapModelAdmin
 from wagtail_svgmap.modeladmin.regions import RegionModelAdmin
 from wagtail_svgmap.models import ImageMap, Region
