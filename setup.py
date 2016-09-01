@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='wagtail_svgmap',
-    version='0.0.1',
+    version='0.0.2',
     packages=find_packages('.', include=('wagtail_svgmap*')),
     include_package_data=True,
     install_requires=['wagtail>=1.5.3'],
