@@ -9,6 +9,12 @@
 * Add `wagtail_svgmap` to your `INSTALLED_APPS`
 * Add a `wagtail_svgmap.blocks.ImageMapBlock()` to a `StreamField` in your page class
 
+#### Settings
+
+* `WAGTAIL_SVGMAP_IE_COMPAT`: Whether or not to wrap the rendered SVGs in special markup
+                              for compatibility with legacy Internet Explorers.  Enabled
+                              by default; disabling leads to slightly nicer markup.
+
 ### As an end user
 
 #### Using the Wagtail Admin
