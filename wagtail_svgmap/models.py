@@ -7,8 +7,9 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from wagtail.wagtailadmin.edit_handlers import FieldPanel
+from wagtail_svgmap import log
 from wagtail_svgmap.mixins import LinkFields
-from wagtail_svgmap.svg import find_ids, Link, serialize_svg, wrap_elements_in_links
+from wagtail_svgmap.svg import find_ids, fix_dimensions, get_dimensions, Link, serialize_svg, wrap_elements_in_links
 
 
 @python_2_unicode_compatible
@@ -25,6 +26,8 @@ class ImageMap(models.Model):
     )
     _ids_cache = models.TextField(editable=False, blank=True, db_column='ids_cache')
     _render_cache = models.TextField(editable=False, blank=True, db_column='render_cache')
+    _width_cache = models.FloatField(editable=False, default=0, db_column='width_cache')
+    _height_cache = models.FloatField(editable=False, default=0, db_column='height_cache')
 
     @property
     def rendered_svg(self):
@@ -67,6 +70,18 @@ class ImageMap(models.Model):
             self.recache_ids()
         return set(self._ids_cache.splitlines() if self._ids_cache else ())
 
+    @property
+    def size(self):
+        """
+        Get the dimensions of the rendered SVG.
+
+        If one or more dimensions are invalid, the (0, 0) tuple is returned.
+
+        :return: Width/height tuple
+        :rtype: tuple[float, float]
+        """
+        return (self._width_cache, self._height_cache)
+
     def save(self, *args, **kwargs):
         super(ImageMap, self).save(*args, **kwargs)
         if self.recache_ids() | self.recache_svg():  # Using `|` for non-short-circuited or
@@ -98,11 +113,16 @@ class ImageMap(models.Model):
         :return: True if the cache changed.
         :rtype: bool
         """
-        old_render_cache = self._render_cache
-        self._render_cache = self._render()
-        changed = (self._render_cache != old_render_cache)
+        old_values = (self._render_cache, self._width_cache, self._height_cache)
+        new_values = self._render()
+        changed = (old_values != new_values)
+        (self._render_cache, self._width_cache, self._height_cache) = new_values
         if changed and save:
-            models.Model.save(self, update_fields=('_render_cache',))
+            models.Model.save(self, update_fields=(
+                '_render_cache',
+                '_width_cache',
+                '_height_cache',
+            ))
         return changed
 
     def _open_original(self):
@@ -120,10 +140,18 @@ class ImageMap(models.Model):
         }
         with self._open_original() as stream:
             tree = wrap_elements_in_links(stream, links)
+            fix_dimensions(tree)
+
+        try:
+            width, height = get_dimensions(tree)
+        except:
+            log.warn('unable to determine dimensions for %s' % self.pk, exc_info=True)
+            width = height = 0
+
         rendered = serialize_svg(tree, xml_declaration=False)
         for link in links.values():  # Sanity check
             assert link.url in rendered
-        return rendered
+        return (rendered, width, height)
 
     def __str__(self):  # pragma: no cover
         return self.title
