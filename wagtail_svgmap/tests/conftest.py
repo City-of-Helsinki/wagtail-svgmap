@@ -1,8 +1,8 @@
+import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-import pytest
 from wagtail.wagtailcore.models import Collection, Page, Site
 from wagtail.wagtaildocs.models import Document
 from wagtail_svgmap.tests.utils import EXAMPLE_SVG_DATA

@@ -1,6 +1,6 @@
+import pytest
 from django.core.urlresolvers import reverse
 
-import pytest
 from wagtail_svgmap.models import ImageMap
 from wagtail_svgmap.tests.utils import IDS_IN_EXAMPLE_SVG
 

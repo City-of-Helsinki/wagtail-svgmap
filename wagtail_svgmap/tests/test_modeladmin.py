@@ -1,4 +1,5 @@
 import pytest
+
 from wagtail_svgmap.modeladmin import ImageMapModelAdmin
 from wagtail_svgmap.modeladmin.regions import RegionModelAdmin
 from wagtail_svgmap.models import ImageMap, Region
@@ -10,7 +11,7 @@ def test_modeladmin(admin_client, example_svg_upload):
     """
     "Integration" test for the modeladmin.
     """
-    
+
     region_url_helper = RegionModelAdmin().url_helper
     image_map_url_helper = ImageMapModelAdmin().url_helper
     resp = admin_client.post(image_map_url_helper.create_url, {

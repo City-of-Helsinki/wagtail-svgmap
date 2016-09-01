@@ -1,8 +1,8 @@
 import json
 
+import pytest
 from django.utils.encoding import force_text
 
-import pytest
 from wagtail.wagtailcore.fields import StreamField
 from wagtail_svgmap.blocks import ImageMapBlock
 from wagtail_svgmap.models import ImageMap
