@@ -10,6 +10,7 @@ from wagtail_svgmap.tests.utils import EXAMPLE2_SVG_DATA, IDS_IN_EXAMPLE2_SVG, I
 def test_id_caching(example_svg_upload):
     map = ImageMap.objects.create(svg=example_svg_upload)
     assert map.ids == IDS_IN_EXAMPLE_SVG
+    assert map.size == (588, 588)
 
 
 @pytest.mark.django_db

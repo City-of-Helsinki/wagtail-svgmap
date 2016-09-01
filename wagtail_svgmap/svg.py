@@ -1,3 +1,5 @@
+import re
+
 from six import BytesIO
 
 try:  # pragma: no cover
@@ -178,3 +180,51 @@ def serialize_svg(tree, encoding='UTF-8', xml_declaration=True):
     fixup_unqualified_attributes(tree, namespace=SVG_NAMESPACE)
     tree.write(bio, encoding=encoding, xml_declaration=xml_declaration, default_namespace=SVG_NAMESPACE)
     return bio.getvalue().decode(encoding)
+
+
+def fix_dimensions(tree):
+    """
+    "Fix" the dimension attributes of the SVG in-place.
+
+    Basically, this replaces hard-coded width and height with a viewbox.
+
+    :param tree: The tree to process.
+    :type tree: xml.etree.ElementTree.ElementTree
+    :return: None; the tree is (possibly) modified in-place.
+    """
+    root = tree.getroot()
+    assert root.tag.endswith('svg')
+    if 'viewBox' not in root.attrib:
+        # Try to generate a viewbox if possible
+        width = root.attrib.get('width')
+        height = root.attrib.get('height')
+        if width and height:
+            root.attrib['viewBox'] = '0 0 %s %s' % (width, height)
+        else:
+            return
+    root.attrib.pop('width', None)
+    root.attrib.pop('height', None)
+
+
+def get_dimensions(tree):
+    """
+    Get the declared dimensions of an SVG tree.
+
+
+    :param tree: The tree to process.
+    :type tree: xml.etree.ElementTree.ElementTree
+    :return: Dimensions (2-tuple of floats) or None if unknown.
+    :rtype: tuple[float, float]|None
+    """
+    root = tree.getroot()
+    assert root.tag.endswith('svg')
+    if 'viewBox' in root.attrib:
+        # Use viewbox ("min-x, min-y, width, height"), separated by whitespace and/or a comma
+        viewbox = re.split(r'[, ]+', root.attrib['viewBox'])
+        return (float(viewbox[2]), float(viewbox[3]))
+    else:
+        # Use width/height
+        width = root.attrib.get('width')
+        height = root.attrib.get('height')
+        if width and height:
+            return (float(width), float(height))
