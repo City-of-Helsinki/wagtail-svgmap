@@ -70,7 +70,7 @@ class ImageMapBlock(blocks.StructBlock):
         style = ';'.join([
             'height: 0',  # collapse the container's height
             'width: %s%%' % width,  # specify any width you want (a percentage value, basically)
-            'padding-top: %s%%' % (width * aspect_ratio),  # makes sure the AR of the container equals the svg's
+            'padding-top: %s%%' % (width / aspect_ratio),  # makes sure the AR of the container equals the svg's
             'position: relative',  # create positioning context for svg
         ]).replace(' ', '')
         return style
