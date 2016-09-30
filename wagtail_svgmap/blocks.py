@@ -47,7 +47,7 @@ class ImageMapBlock(blocks.StructBlock):
             'svg': image_map.rendered_svg,
         }
 
-        if self.ie_compatibility:
+        if self.ie_compatibility:  # pragma: no branch
             wrapper += '<style>%(style)s</style>' % {
                 'style': '#%s svg{position:absolute;top:0;left:0}' % attrs['id'],
             }
@@ -55,7 +55,7 @@ class ImageMapBlock(blocks.StructBlock):
         return mark_safe(wrapper)
 
     def compute_wrapper_style(self, image_map):
-        if not self.ie_compatibility:
+        if not self.ie_compatibility:  # pragma: no cover
             return None
         # * See http://tympanus.net/codrops/2014/08/19/making-svgs-responsive-with-css/
         #   for the source of this sorcery.
@@ -63,7 +63,8 @@ class ImageMapBlock(blocks.StructBlock):
         try:
             height, width = image_map.size
             aspect_ratio = (height / width)
-        except ZeroDivisionError:  # Assume square, that's about the best we can do
+        except ZeroDivisionError:  # pragma: no cover
+            # Assume square, that's about the best we can do
             aspect_ratio = 1
 
         width = 100  # left as a variable for future expansion

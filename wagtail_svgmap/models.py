@@ -144,7 +144,7 @@ class ImageMap(models.Model):
 
         try:
             width, height = get_dimensions(tree)
-        except:
+        except:  # pragma: no cover
             log.warn('unable to determine dimensions for %s' % self.pk, exc_info=True)
             width = height = 0
 
