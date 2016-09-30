@@ -1,8 +1,11 @@
 import pytest
 from django.core.urlresolvers import reverse
+from django.utils.crypto import get_random_string
 
+from bs4 import BeautifulSoup
 from wagtail_svgmap.models import ImageMap
 from wagtail_svgmap.tests.utils import IDS_IN_EXAMPLE_SVG
+from wsm_test.models import TestPage
 
 
 @pytest.mark.django_db
@@ -43,3 +46,43 @@ def test_admin(admin_client, example_svg_upload):
     assert map.regions.count() == 2
     assert '/foo/' in map.rendered_svg
     assert '/bar/' in map.rendered_svg
+
+
+@pytest.mark.django_db
+def test_page_creation(admin_client, root_page, example_imagemap):
+    """
+    A test for issue #9 (i.e. that admin views for pages with streamblocks
+    with imagemapfields do retain their choice when the page is opened).
+    """
+    # First, create the page using the admin:
+    title = get_random_string(allowed_chars='oeiu')
+    admin_client.post(
+        reverse(
+            'wagtailadmin_pages:add',
+            args=('wsm_test', 'testpage', root_page.pk,),
+        ),
+        {
+            'next': '',
+            'title': title,
+            'body-count': '1',
+            'body-0-deleted': '',
+            'body-0-order': '0',
+            'body-0-type': 'imagemap',
+            'body-0-value-map': example_imagemap.pk,
+            'body-0-value-css_class': 'erd',
+            'slug': title,
+            'seo_title': '',
+            'search_description': '',
+            'go_live_at': '',
+            'expire_at': '',
+        }
+    )
+    # Retrieve it...
+    page = TestPage.objects.get(slug=title)
+
+    # Go to the edit page...
+    content = admin_client.get(reverse('wagtailadmin_pages:edit', args=(page.pk,))).content
+    # ... and check that the imagemap streamblock has the correct option selected:
+    select = BeautifulSoup(content, 'html.parser').find(id='body-0-value-map')
+    example_map_option = select.find(value=str(example_imagemap.pk))
+    assert example_map_option.get('selected')

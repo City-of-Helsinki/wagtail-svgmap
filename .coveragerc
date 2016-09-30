@@ -1,6 +1,9 @@
 [run]
 branch = True
 omit =
-    *migrations*
     *management*
+    *migrations*
     *site-packages*
+    manage.py
+    setup.py
+    wsm_test/wsgi.py
