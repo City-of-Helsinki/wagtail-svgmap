@@ -18,6 +18,14 @@ class _ImageMapChoiceBlock(blocks.ChooserBlock):
     target_model = ImageMap
     widget = Select
 
+    def value_for_form(self, value):
+        if hasattr(value, 'pk'):
+            return value.pk
+        return value
+
+    def value_from_form(self, value):
+        return super(_ImageMapChoiceBlock, self).value_from_form(value or None)
+
 
 class ImageMapBlock(blocks.StructBlock):
     """
