@@ -24,6 +24,18 @@ def test_image_replacing(example_svg_upload):
 
 
 @pytest.mark.django_db
+def test_image_replacing_with_region(example_svg_upload):
+    """
+    Test that replacing an image with a new one won't crash if the element IDs change.
+    Refs https://github.com/City-of-Helsinki/wagtail-svgmap/issues/11 (#11)
+    """
+    map = ImageMap.objects.create(svg=example_svg_upload)
+    map.regions.create(element_id='red', link_external='https://google.com/')
+    map.svg.save('example2.svg', ContentFile(EXAMPLE2_SVG_DATA))
+    assert 'https://google.com' not in map.rendered_svg  # can't be there as 'red' is not there
+
+
+@pytest.mark.django_db
 def test_rendering(root_page, example_svg_upload, dummy_wagtail_doc):
     page = Page(title="nnep", slug="nnep")
     page.set_url_path(root_page)
