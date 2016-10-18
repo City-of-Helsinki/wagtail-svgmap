@@ -149,8 +149,9 @@ class ImageMap(models.Model):
             width = height = 0
 
         rendered = serialize_svg(tree, xml_declaration=False)
-        for link in links.values():  # Sanity check
-            assert link.url in rendered
+        for element_id, link in links.items():  # Sanity check
+            if element_id in rendered:  # If the target element exists at all,
+                assert link.url in rendered  # The link URL should be there too
         return (rendered, width, height)
 
     def __str__(self):  # pragma: no cover

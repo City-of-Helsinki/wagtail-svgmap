@@ -1,17 +1,13 @@
-import json
-
 import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import connections
 from django.utils.crypto import get_random_string
-
 from wagtail.wagtailcore.models import Collection, Page, Site
 from wagtail.wagtaildocs.models import Document
+
 from wagtail_svgmap.models import ImageMap
 from wagtail_svgmap.tests.utils import EXAMPLE_SVG_DATA
-from wsm_test.models import TestPage
 
 
 @pytest.fixture()
