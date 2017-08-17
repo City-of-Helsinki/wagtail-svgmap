@@ -38,7 +38,7 @@ class ImageMapBlock(blocks.StructBlock):
     # Feel free to override this in an `ImageMapBlock` subclass of your own!
     ie_compatibility = getattr(settings, 'WAGTAIL_SVGMAP_IE_COMPAT', True)
 
-    def render(self, value):
+    def render(self, value, context=None):
         if not value:  # pragma: no cover
             return ''
 
