@@ -31,7 +31,7 @@ class RegionCommonMixin(object):
                 # the image map parameter could be incorrect (if manually entered); ah well
                 pass
 
-        if image_map:  # pragma: no branch
+        if image_map and 'form' in context:  # pragma: no branch
             # Switch the element ID widget to a select, since we can't have
             # a ChoiceField of element IDs.
             context['form'].fields['element_id'].widget = Select(
