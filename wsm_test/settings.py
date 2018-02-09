@@ -80,3 +80,4 @@ BASE_URL = 'http://example.com'
 DEBUG = True
 SECRET_KEY = 'x'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+WAGTAIL_APPEND_SLASH = False
