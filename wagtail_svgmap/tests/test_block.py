@@ -3,7 +3,11 @@ import json
 import pytest
 from django.utils.encoding import force_text
 
-from wagtail.wagtailcore.fields import StreamField
+try:
+    from wagtail.core.fields import StreamField
+except ImportError:
+    from wagtail.wagtailcore.fields import StreamField
+
 from wagtail_svgmap.blocks import ImageMapBlock
 from wagtail_svgmap.models import ImageMap
 

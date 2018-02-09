@@ -4,12 +4,14 @@ cache:
   directories:
     - "$HOME/.cache/pip"
 env:
-  - DEBUG=1
+  - DEBUG=1 WAGTAIL=wagtail==1.6.3
+  - DEBUG=1 WAGTAIL="wagtail<2.0"
+  - DEBUG=1 WAGTAIL=wagtail==2.0b1
 python:
   - "2.7"
   - "3.4"
 install:
   - pip install -U pip
-  - pip install -r requirements.txt -r requirements-dev.txt
+  - pip install "$WAGTAIL" -r requirements-dev.txt
 script:
   - py.test -ra -vvv --cov --cov-report term-missing

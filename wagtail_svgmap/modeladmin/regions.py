@@ -3,7 +3,10 @@ from django.shortcuts import redirect
 
 from wagtail.contrib.modeladmin.options import ModelAdmin
 from wagtail.contrib.modeladmin.views import CreateView, DeleteView, EditView
-from wagtail.wagtailadmin import messages
+try:
+    from wagtail.admin import messages
+except ImportError:
+    from wagtail.wagtailadmin import messages
 from wagtail_svgmap.models import ImageMap, Region
 
 from .image_maps import ImageMapModelAdmin
@@ -31,7 +34,7 @@ class RegionCommonMixin(object):
                 # the image map parameter could be incorrect (if manually entered); ah well
                 pass
 
-        if image_map:  # pragma: no branch
+        if image_map and 'form' in context:  # pragma: no branch
             # Switch the element ID widget to a select, since we can't have
             # a ChoiceField of element IDs.
             context['form'].fields['element_id'].widget = Select(

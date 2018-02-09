@@ -1,5 +1,8 @@
 import pytest
-from django.core.urlresolvers import reverse
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 from django.utils.crypto import get_random_string
 
 from bs4 import BeautifulSoup
@@ -85,4 +88,4 @@ def test_page_creation(admin_client, root_page, example_imagemap):
     # ... and check that the imagemap streamblock has the correct option selected:
     select = BeautifulSoup(content, 'html.parser').find(id='body-0-value-map')
     example_map_option = select.find(value=str(example_imagemap.pk))
-    assert example_map_option.get('selected')
+    assert example_map_option.get('selected') is not None
