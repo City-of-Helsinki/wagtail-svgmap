@@ -15,7 +15,7 @@ python:
 matrix:
   exclude:
   - python: 2.7
-    env: WAGTAIL=WAGTAIL==2.0b1
+    env: DEBUG=1 WAGTAIL=WAGTAIL==2.0b1
 
 install:
   - pip install -U pip
