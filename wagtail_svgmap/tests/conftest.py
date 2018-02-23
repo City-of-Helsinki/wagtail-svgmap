@@ -3,8 +3,13 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.crypto import get_random_string
-from wagtail.wagtailcore.models import Collection, Page, Site
-from wagtail.wagtaildocs.models import Document
+
+try:
+    from wagtail.core.models import Collection, Page, Site
+    from wagtail.documents.models import Document
+except ImportError:
+    from wagtail.wagtailcore.models import Collection, Page, Site
+    from wagtail.wagtaildocs.models import Document
 
 from wagtail_svgmap.models import ImageMap
 from wagtail_svgmap.tests.utils import EXAMPLE_SVG_DATA

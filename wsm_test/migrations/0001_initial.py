@@ -4,8 +4,11 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import django.db.models.deletion
-import wagtail.wagtailcore.blocks
-import wagtail.wagtailcore.fields
+try:
+    from wagtail.core import blocks, fields
+except ImportError:
+    from wagtail.wagtailcore import blocks, fields
+
 import wagtail_svgmap.blocks
 
 
@@ -22,7 +25,7 @@ class Migration(migrations.Migration):
             name='TestPage',
             fields=[
                 ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.Page')),
-                ('body', wagtail.wagtailcore.fields.StreamField((('heading', wagtail.wagtailcore.blocks.CharBlock(classname='full title')), ('paragraph', wagtail.wagtailcore.blocks.RichTextBlock()), ('imagemap', wagtail_svgmap.blocks.ImageMapBlock())))),
+                ('body', fields.StreamField((('heading', blocks.CharBlock(classname='full title')), ('paragraph', blocks.RichTextBlock()), ('imagemap', wagtail_svgmap.blocks.ImageMapBlock())))),
             ],
             options={
                 'abstract': False,

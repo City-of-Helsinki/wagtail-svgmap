@@ -6,7 +6,10 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from wagtail.wagtailadmin.edit_handlers import FieldPanel
+try:
+    from wagtail.admin.edit_handlers import FieldPanel
+except ImportError:
+    from wagtail.wagtailadmin.edit_handlers import FieldPanel
 from wagtail_svgmap import log
 from wagtail_svgmap.mixins import LinkFields
 from wagtail_svgmap.svg import find_ids, fix_dimensions, get_dimensions, Link, serialize_svg, wrap_elements_in_links
@@ -164,7 +167,7 @@ class Region(LinkFields, models.Model):
     Child model to specify the link target for a given element in a given image map.
     """
 
-    image_map = models.ForeignKey(to=ImageMap, related_name='regions')
+    image_map = models.ForeignKey(to=ImageMap, related_name='regions', on_delete=models.SET_NULL)
     element_id = models.CharField(verbose_name=_('element ID'), max_length=64)
     target = models.CharField(
         verbose_name=_('link target'), blank=True, max_length=64,

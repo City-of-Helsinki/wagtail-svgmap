@@ -1,7 +1,11 @@
 import pytest
 from django.core.files.base import ContentFile
 
-from wagtail.wagtailcore.models import Page
+try:
+    from wagtail.core.models import Page
+except ImportError:
+    from wagtail.wagtailcore.models import Page
+
 from wagtail_svgmap.models import ImageMap
 from wagtail_svgmap.tests.utils import EXAMPLE2_SVG_DATA, IDS_IN_EXAMPLE2_SVG, IDS_IN_EXAMPLE_SVG
 

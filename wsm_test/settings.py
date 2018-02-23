@@ -4,21 +4,46 @@ PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VAR_DIR = os.path.join(PROJECT_DIR, 'var')
 if not os.path.isdir(VAR_DIR):  # pragma: no cover
     os.makedirs(VAR_DIR)
+
 INSTALLED_APPS = [
     'wsm_test',
     'wagtail_svgmap',
-    'wagtail.wagtailforms',
-    'wagtail.wagtailredirects',
-    'wagtail.wagtailembeds',
-    'wagtail.wagtailsites',
-    'wagtail.wagtailusers',
-    'wagtail.wagtailsnippets',
-    'wagtail.wagtaildocs',
-    'wagtail.wagtailimages',
-    'wagtail.wagtailsearch',
-    'wagtail.wagtailadmin',
-    'wagtail.wagtailcore',
-    'wagtail.contrib.modeladmin',
+]
+
+try:
+    import wagtail.core
+    # wagtail2
+    INSTALLED_APPS.extend([
+        'wagtail.core.forms',
+        'wagtail.contrib.redirects',
+        'wagtail.embeds',
+        'wagtail.core.sites',
+        'wagtail.users',
+        'wagtail.snippets',
+        'wagtail.documents',
+        'wagtail.images',
+        'wagtail.search',
+        'wagtail.admin',
+        'wagtail.core',
+        'wagtail.contrib.modeladmin'])
+except ImportError:
+    # wagtail 1.x
+    INSTALLED_APPS.extend([
+        'wagtail.wagtailforms',
+        'wagtail.wagtailredirects',
+        'wagtail.wagtailembeds',
+        'wagtail.wagtailsites',
+        'wagtail.wagtailusers',
+        'wagtail.wagtailsnippets',
+        'wagtail.wagtaildocs',
+        'wagtail.wagtailimages',
+        'wagtail.wagtailsearch',
+        'wagtail.wagtailadmin',
+        'wagtail.wagtailcore',
+        'wagtail.contrib.modeladmin'])
+
+
+INSTALLED_APPS.extend([
     'modelcluster',
     'taggit',
     'django.contrib.admin',
@@ -27,19 +52,31 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-]
-MIDDLEWARE_CLASSES = [
+])
+
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'wagtail.wagtailcore.middleware.SiteMiddleware',
-    'wagtail.wagtailredirects.middleware.RedirectMiddleware',
+    'django.middleware.security.SecurityMiddleware'
 ]
+
+try:
+    import wagtail.core
+    # wagtail2
+    MIDDLEWARE.extend([
+        'wagtail.core.middleware.SiteMiddleware',
+        'wagtail.contrib.redirects.middleware.RedirectMiddleware',
+    ])
+except ImportError:
+    MIDDLEWARE.extend([
+        'wagtail.wagtailcore.middleware.SiteMiddleware',
+        'wagtail.wagtailredirects.middleware.RedirectMiddleware',
+    ])
+
 ROOT_URLCONF = 'wsm_test.urls'
 TEMPLATES = [
     {

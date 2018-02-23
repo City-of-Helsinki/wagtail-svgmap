@@ -1,5 +1,10 @@
-from wagtail.wagtailcore.models import Page
-from wagtail.wagtaildocs.models import Document
+try:
+    from wagtail.core.models import Page
+    from wagtail.documents.models import Document
+except ImportError:
+    from wagtail.wagtailcore.models import Page
+    from wagtail.wagtaildocs.models import Document
+
 from wagtail_svgmap import log
 from wagtail_svgmap.models import ImageMap
 
