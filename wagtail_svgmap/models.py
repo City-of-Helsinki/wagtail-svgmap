@@ -167,7 +167,7 @@ class Region(LinkFields, models.Model):
     Child model to specify the link target for a given element in a given image map.
     """
 
-    image_map = models.ForeignKey(to=ImageMap, related_name='regions', on_delete=models.SET_NULL)
+    image_map = models.ForeignKey(to=ImageMap, related_name='regions', on_delete=models.CASCADE)
     element_id = models.CharField(verbose_name=_('element ID'), max_length=64)
     target = models.CharField(
         verbose_name=_('link target'), blank=True, max_length=64,
