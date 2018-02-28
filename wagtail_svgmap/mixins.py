@@ -21,7 +21,7 @@ class LinkFields(models.Model):
         blank=True,
         related_name='+',
         verbose_name=_('linked page'),
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
     )
     link_document = models.ForeignKey(
         'wagtaildocs.Document',
@@ -29,7 +29,7 @@ class LinkFields(models.Model):
         blank=True,
         related_name='+',
         verbose_name=_('linked document'),
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
     )
 
     @property
