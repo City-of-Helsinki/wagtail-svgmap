@@ -30,11 +30,18 @@
   Once you've selected an SVG file, you can then set which pages/documents/external URLs
   each discovered ID should link to.
 
-#### In pages
+#### In the Wagtail Admin
 
 * In a page that has an `ImageMapBlock`-enabled stream field, select the image map to use.
   You can also additionally set a CSS class to wrap the field with. Ask your friendly
   neighborhood designer for more information.
+
+### Rendering in Templates
+
+* Blocks of type `ImageMapBlock` usually render in the StreamField.
+  Some uses of include can stop StreamField elements like `ImageMapBlock` from rendering.
+  You can render the svg map manually by calling `map.rendered_svg` on the block
+  in your template: `block_with_imagemap.map.rendered_svg|safe`
 
 ## Development
 
